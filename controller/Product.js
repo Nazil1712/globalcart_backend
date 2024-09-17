@@ -53,16 +53,16 @@ exports.fetchProductsAPI = async (req,res) =>{
 exports.fetchProductByIdAPI = async(req,res) =>{
     const params_id = req.params.id;
     try{
-        const response = await Product.find({_id : params_id})
+        const response = await Product.findOne({_id : params_id})
         res.status(200).json(response)
     }catch(error) {
         res.status(400).json(error)
     }
 }
 
-exports.insertMany = async(req,res) =>{
+exports.insertManyAPI = async(req,res) =>{
     try{
-        const response = await Product.insertMany(req.body,{ordered:false, rawResult:true})
+        const response = await Product.insertManyAPI(req.body,{ordered:false, rawResult:true})
         res.status(200).json(response)
     }catch(error) {
         res.status(400).json(error)

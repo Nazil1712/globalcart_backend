@@ -1,6 +1,6 @@
 const { Brand } = require("../model/Brand")
 
-exports.fetchAllBrands = async(req,res) =>{
+exports.fetchAllBrandsAPI = async(req,res) =>{
     try{
         const response = await Brand.find({})
         res.status(200).json(response)
@@ -10,7 +10,7 @@ exports.fetchAllBrands = async(req,res) =>{
 } 
 
 
-exports.createBrand = async(req,res) => {
+exports.createBrandAPI = async(req,res) => {
     try{
         const brand = new Brand(req.body)
         const response = await brand.save()

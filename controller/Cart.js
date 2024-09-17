@@ -1,0 +1,48 @@
+const {Cart} = require("../model/Cart")
+
+exports.fetchCartByUserAPI = async(req,res) =>{
+    const {user} = req.query;
+
+    try{
+        const cartItems = await Cart.find({user:user}).populate('user').populate('product')
+        res.status(200).json(cartItems)
+    }catch(error) {
+        res.status(400).json(error)
+    }
+} 
+
+exports.addToCartAPI = async(req,res) => {
+    try{
+        const cart = new Cart(req.body)
+        const result = await cart.populate('product')
+        const response = await cart.save()
+        res.status(200).json(result)
+    }catch(error) {
+        res.status(400).json(error)
+    }
+}
+
+exports.deleteFromCartAPI = async(req,res) => {
+    const {id} = req.params;
+
+    console.log(req.params)
+    try{
+        const response = await Cart.findByIdAndDelete(id)
+        res.status(200).json(response)
+    }catch(error) {
+        res.status(400).json(error)
+    }
+}
+
+exports.updateCartAPI = async(req,res) => {
+    const {id} = req.params;
+    console.log(req.body)
+
+    try{
+        const doc = await Cart.findOneAndUpdate({_id:id},req.body,{new:true})
+        const response = await doc.populate('product')
+        res.status(200).json(response)
+    }catch(error) {
+        res.status(400).json(error)
+    }
+}

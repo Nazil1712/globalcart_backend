@@ -1,12 +1,12 @@
 const express = require('express')
-const { fetchAllCategories, createCategory } = require('../controller/Category')
+const { fetchAllCategoriesAPI, createCategoryAPI } = require('../controller/Category')
 const app = express()
 const router = express.Router()
 
 
 
 router
-    .get('/',fetchAllCategories)
-    .post('/',createCategory)
+    .get('/',fetchAllCategoriesAPI)
+    .post('/',createCategoryAPI)
 
 module.exports = router
