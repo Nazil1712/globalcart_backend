@@ -25,7 +25,6 @@ exports.addToCartAPI = async(req,res) => {
 exports.deleteFromCartAPI = async(req,res) => {
     const {id} = req.params;
 
-    console.log(req.params)
     try{
         const response = await Cart.findByIdAndDelete(id)
         res.status(200).json(response)
@@ -36,7 +35,6 @@ exports.deleteFromCartAPI = async(req,res) => {
 
 exports.updateCartAPI = async(req,res) => {
     const {id} = req.params;
-    console.log(req.body)
 
     try{
         const doc = await Cart.findOneAndUpdate({_id:id},req.body,{new:true})

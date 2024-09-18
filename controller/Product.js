@@ -12,7 +12,7 @@ exports.createProductAPI = async(req,res)=>{
 
 // fetchAllProductsAPI + fetchProductsByFIlterAPI = fetchProductsAPI
 exports.fetchProductsAPI = async (req,res) =>{
-    let query = Product.find({})
+    let query = Product.find({deleted : {$ne : true}})
 
     if(req.query.category) {
         query = query.find({category : req.query.category})
@@ -29,7 +29,6 @@ exports.fetchProductsAPI = async (req,res) =>{
     let totalDocs;
     try{
         totalDocs = await query.clone().countDocuments() // Use .clone() to avoid modifying the original query
-        console.log(totalDocs)
     }catch(error) {
         res.status(400).json(error)
     }
