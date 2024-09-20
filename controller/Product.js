@@ -4,6 +4,7 @@ exports.createProductAPI = async(req,res)=>{
     try{
         const product = new Product(req.body)
         const response = await product.save()
+        console.log(response)
         res.status(201).json(response)
     }catch(error) {
         res.status(400).json(error)
@@ -12,7 +13,15 @@ exports.createProductAPI = async(req,res)=>{
 
 // fetchAllProductsAPI + fetchProductsByFIlterAPI = fetchProductsAPI
 exports.fetchProductsAPI = async (req,res) =>{
-    let query = Product.find({deleted : {$ne : true}})
+    const isAdmin = req.query.admin
+    let condition = {}
+
+    if(!isAdmin) {
+        condition = {deleted : {$ne : true}};
+    }
+
+
+    let query = Product.find(condition)
 
     if(req.query.category) {
         query = query.find({category : req.query.category})
