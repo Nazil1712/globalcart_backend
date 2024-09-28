@@ -1,29 +1,54 @@
-const { User } = require("../model/User")
+const { User } = require("../model/User");
+const crypto = require("crypto");
+const { sanitizeUser } = require("../services/common");
+const SECRET_KEY = "SECRET_KEY";
+const jwt = require("jsonwebtoken");
 
-exports.createUserAPI = async(req,res) => {
-    try{
-        const user = new User(req.body)
-        const response = await user.save()
-        res.status(200).json(response)
-    }catch(error) {
-        res.status(400).json(error)
-    }
-}
+exports.createUserAPI = async (req, res) => {
+  // console.log("User from createUserAPI", req.body);
+  try {
+    const salt = crypto.randomBytes(16);
+    crypto.pbkdf2(
+      req.body.password,
+      salt,
+      310000,
+      32,
+      "sha256",
+      async function (err, hashedPassword) {
+        const user = new User({ ...req.body, password: hashedPassword, salt });
+        const doc = await user.save();
+        req.login(sanitizeUser(doc), (err) => {
+          // this also calls serializer and adds to session
+          if (err) {
+            res.status(400).json(err);
+          } else {
+            const token = jwt.sign(sanitizeUser(doc), SECRET_KEY);
+            res
+              .cookie("jwt", token, {
+                expires: new Date(Date.now() + 3600000),
+                httpOnly: true,
+              })
+              .status(201)
+              .json(token);
+          }
+        });
+      }
+    );
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
 
-exports.checkUserAPI = async(req,res) =>{
-    const params_id = req.params_id;
+exports.loginUserAPI = async (req, res) => {
+  res
+    .cookie("jwt", req.user.token, {
+      expires: new Date(Date.now() + 3600000),
+      httpOnly: true,
+    })
+    .status(201)
+    .json(req.user);
+};
 
-    try{
-        const user = await User.findOne({email : req.body.email})
-
-        if(!user) {
-            res.status(401).json({message : "No such user exists!"})
-        }else if(user.password === req.body.password) {
-            res.status(200).json({role: user.role, id:user.id})
-        }else{
-            res.status(401).json({message: "Invalid credentials"})
-        }
-    }catch(error) {
-        res.status(400).json(error)
-    }
-} 
+exports.checkUserAPI = async (req, res) => {
+  res.json({ status: "success", user: req.user });
+};

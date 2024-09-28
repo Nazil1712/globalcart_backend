@@ -5,7 +5,7 @@ const router = express.Router()
 
 
 router
-    .get('/:id', fetchLoggedInUser)
+    .get('/own', fetchLoggedInUser)
     .put('/:id',updateUserAPI)
 
 module.exports = router

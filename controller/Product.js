@@ -4,7 +4,7 @@ exports.createProductAPI = async(req,res)=>{
     try{
         const product = new Product(req.body)
         const response = await product.save()
-        console.log(response)
+        // console.log(response)
         res.status(201).json(response)
     }catch(error) {
         res.status(400).json(error)

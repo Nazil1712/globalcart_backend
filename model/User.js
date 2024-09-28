@@ -3,10 +3,11 @@ const {Schema} = mongoose;
 
 const userSchema = new Schema({
     email : {type: String, required: true , unique:true},
-    password : {type : String, requried: true },
+    password : {type : Buffer, requried: true },
     addresses : {type: [Schema.Types.Mixed], required: true},
     name:{type:String},
-    role : {type : String, default:'user'}
+    role : {type : String, default:'user'},
+    salt : Buffer
 },{
     toJSON:{
         versionKey: false,

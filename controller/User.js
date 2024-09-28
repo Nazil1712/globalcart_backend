@@ -13,11 +13,11 @@ exports.updateUserAPI = async(req,res) =>{
 
 
 exports.fetchLoggedInUser = async(req,res) =>{
-    const {id} = req.params;
+    const {id} = req.user;
 
     try{
         const user = await User.findById(id);
-        res.status(200).json(user)
+        res.status(200).json({email:user.email, role:user.role, addresses:user.addresses, id:user.id})
     }catch(error) {
         res.status(400).json(error)
     }

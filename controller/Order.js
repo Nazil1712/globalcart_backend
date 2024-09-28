@@ -2,8 +2,8 @@ const {Order} = require("../model/Order")
 
 exports.fetchOrderByUserAPI = async(req,res) =>{
     
-    const {id} = req.params
-    console.log(req.params)
+    const {id} = req.user
+    console.log("OrderByUser",id)
 
     try{
         const orderItems = await Order.find({user:id})

@@ -11,7 +11,7 @@ const router = express.Router();
 
 router
   .post("/", addToCartAPI)
-  .get("/", fetchCartByUserAPI)
+  .get("/own", fetchCartByUserAPI)
   .delete("/:id", deleteFromCartAPI)
   .patch("/:id", updateCartAPI);
 
