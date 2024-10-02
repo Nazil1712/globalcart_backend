@@ -82,7 +82,7 @@ passport.use(new LocalStrategy({
           return done(null, false, { message: 'invalid credentials' });
         }
         const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
-        done(null, {token}); // this lines sends to serializer
+        done(null, sanitizeUser(user)); // this lines sends to serializer
       }
     );
   }
