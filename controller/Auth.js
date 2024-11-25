@@ -17,9 +17,9 @@ exports.createUserAPI = async (req, res) => {
       async function (err, hashedPassword) {
         const user = new User({ ...req.body, password: hashedPassword, salt });
         const doc = await user.save();
-        const userIdR = sanitizeUser(doc)
+        const userIdR = sanitizeUser(doc);
         req.login(userIdR, (err) => {
-          // this also calls serializer and adds to session
+          // this also calls serializer and creates a new session
           if (err) {
             res.status(400).json(err);
           } else {
@@ -28,9 +28,11 @@ exports.createUserAPI = async (req, res) => {
               .cookie("jwt", token, {
                 expires: new Date(Date.now() + 3600000),
                 httpOnly: true,
+                sameSite: "Strict",
               })
               .status(201)
               .json(userIdR);
+            // console.log("Token", token);
           }
         });
       }
@@ -45,15 +47,19 @@ exports.loginUserAPI = async (req, res) => {
     .cookie("jwt", req.user.token, {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
+      sameSite: "Strict",
     })
     .status(201)
     .json(req.user);
+
+  console.log("Cookie has been set successfully");
 };
 
 exports.checkAuth = async (req, res) => {
-  if(req.user) {
+  if (req.user) {
     res.json(req.user);
-  }else{
-    res.sendStatus(401)
+  } else {
+    console.log("hey bro Error is here");
+    res.sendStatus(401);
   }
 };
