@@ -1,6 +1,6 @@
 const { User } = require("../model/User");
 const crypto = require("crypto");
-const { sanitizeUser } = require("../services/common");
+const { sanitizeUser, sendMail } = require("../services/common");
 const SECRET_KEY = "SECRET_KEY";
 const jwt = require("jsonwebtoken");
 
@@ -60,6 +60,72 @@ exports.checkAuth = async (req, res) => {
     res.json(req.user);
   } else {
     console.log("hey bro Error is here");
+    res.sendStatus(401);
+  }
+};
+
+exports.resetPasswordRequest = async (req, res) => {
+  const email = req.body.email
+  const user = await User.findOne({ email:  email});
+
+  if (user) {
+    const token = crypto.randomBytes(40).toString("hex");
+    user.resetPasswordToken = token;
+    await user.save()
+
+    const resetPageLink = `http://localhost:3000/reset-password?token=`+token+`&email=${email}`;
+    const subject = "Reset password for E-commerce";
+    const html = `<p>Click <a href=${resetPageLink}>here</a> to reset your password</p>`;
+
+    console.log("FOr mail sending", req.body);
+    if (email) {
+      const response = await sendMail(req.body.email, subject, null, html);
+      console.log("REsponse", response);
+      res.send({status: "Success"})
+    } else {
+      console.log("hey bro Error is here");
+      res.sendStatus(401);
+    }
+  }
+  else{
+    res.sendStatus(401);
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const {email, password, token} = req.body
+
+  const user = await User.findOne({ email:  email, resetPasswordToken: token});
+
+  if (user) {
+    const salt = crypto.randomBytes(16);
+    crypto.pbkdf2(
+      req.body.password,
+      salt,
+      310000,
+      32,
+      "sha256",
+      async function (err, hashedPassword) {
+        user.password = hashedPassword;
+        user.salt = salt;
+        await user.save()
+      }
+    );
+
+    const subject = "Password successfully reset for E-commerce";
+    const html = `<p>Successfully able to reset your password</p>`;
+
+    // console.log("FOr mail sending", req.body);
+    if (email) {
+      const response = await sendMail(req.body.email, subject, null, html);
+      console.log("REsponse", response);
+      res.send({status: "Success"})
+    } else {
+      console.log("hey bro Error is here");
+      res.sendStatus(401);
+    }
+  }
+  else{
     res.sendStatus(401);
   }
 };

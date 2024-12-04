@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const session = require("express-session");
-const nodemailer = require("nodemailer");
 
 // passportJs things
 const passport = require("passport");
@@ -28,20 +27,6 @@ const { isAuth, sanitizeUser, cookiExtractor } = require("./services/common");
 const path = require("path");
 
 const SECRET_KEY = "SECRET_KEY";
-
-// Forgot Password
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  port: 587,
-  secure: false,
-  auth: {
-    user: "ndhalwala@gmail.com",
-    pass: "cystbfxmssuvwqvg",
-  },
-});
-
-
 
 // JWT options
 const opts = {};
@@ -82,20 +67,6 @@ app.use("/users", isAuth(), userRouter);
 app.use("/auth", authRouter);
 app.use("/cart", isAuth(), cartRouter);
 app.use("/order", isAuth(), orderRouter);
-
-
-app.post("/mail",async (req, res) => {
-  const {to} = req.body
-  const info = await transporter.sendMail({
-    from: '"E-Commerce" <ndhalwala@gmail.com>', // sender address
-    to: to, // list of receivers
-    subject: "Hello ✔", // Subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // html body
-  });
-
-  res.json(info);
-})
 
 // LocalStrategy
 passport.use(
