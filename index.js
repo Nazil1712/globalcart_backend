@@ -56,6 +56,7 @@ app.post(
     switch (event.type) {
       case "payment_intent.succeeded":
         const paymentIntentSucceeded = event.data.object;
+        console.log(paymentIntentSucceeded)
         // Then define and call a function to handle the event payment_intent.succeeded
         break;
       // ... handle other event types
@@ -68,7 +69,7 @@ app.post(
   }
 );
 
-// app.use(express.static(path.resolve(__dirname,'build')))
+app.use(express.static(path.resolve('build')))
 app.use(cookieParser()); // so that we can have cookies
 // app.use(express.raw({type: 'application/json'}))
 app.use(express.json()); // to parse req.body
