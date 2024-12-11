@@ -12,7 +12,9 @@ const categorySchema = new Schema({
         transform: function (doc, ret) {
             delete ret._id;
         }
-    }
+    },
+    timestamps: true,
+
 })
 
 

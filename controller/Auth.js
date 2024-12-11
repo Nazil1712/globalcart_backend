@@ -47,12 +47,11 @@ exports.loginUserAPI = async (req, res) => {
     .cookie("jwt", req.user.token, {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
-      sameSite: "Strict",
     })
     .status(201)
     .json(req.user);
 
-  console.log("Cookie has been set successfully");
+  // console.log("Cookie has been set successfully");
 };
 
 exports.checkAuth = async (req, res) => {
@@ -129,3 +128,16 @@ exports.resetPassword = async (req, res) => {
     res.sendStatus(401);
   }
 };
+
+
+exports.logOut = async(req,res) =>{
+  res
+    .cookie("jwt", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    })
+    .status(200)
+    .json({status: "success"})
+
+  // console.log("SignOut controller called");
+}

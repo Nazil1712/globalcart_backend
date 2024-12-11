@@ -36,6 +36,7 @@ const productSchema = new Schema(
         delete ret._id;
       },
     },
+    timestamps: true,
   }
 );
 

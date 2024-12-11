@@ -7,7 +7,7 @@ exports.fetchOrderByUserAPI = async(req,res) =>{
 
     try{
         const orderItems = await Order.find({user:id})
-        console.log("OrderItems",orderItems)
+        // console.log("OrderItems",orderItems)
         res.status(200).json(orderItems)
     }catch(error) {
         res.status(400).json(error)
