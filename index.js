@@ -69,7 +69,7 @@ app.post(
   }
 );
 
-// app.use(express.static(path.resolve(__dirname,'build')))
+app.use(express.static(path.resolve(__dirname,'build')))
 app.use(cookieParser()); // so that we can have cookies
 // app.use(express.raw({type: 'application/json'}))
 app.use(express.json()); // to parse req.body
