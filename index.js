@@ -33,6 +33,7 @@ opts.jwtFromRequest = cookiExtractor;
 opts.secretOrKey = process.env.JWT_SECRET_KEY; // TODO: should not be in code;
 
 
+
 // Webhook
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
 const endpointSecret = process.env.END_POINT_SECRET;
@@ -56,12 +57,12 @@ app.post(
     switch (event.type) {
       case "payment_intent.succeeded":
         const paymentIntentSucceeded = event.data.object;
-        console.log(paymentIntentSucceeded)
+        // console.log(paymentIntentSucceeded)
         // Then define and call a function to handle the event payment_intent.succeeded
         break;
       // ... handle other event types
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        // console.log(`Unhandled event type ${event.type}`);
     }
 
     // Return a 200 response to acknowledge receipt of the event
@@ -69,7 +70,7 @@ app.post(
   }
 );
 
-app.use(express.static(path.resolve(__dirname,'build')))
+// app.use(express.static(path.resolve(__dirname,'build')))
 app.use(cookieParser()); // so that we can have cookies
 // app.use(express.raw({type: 'application/json'}))
 app.use(express.json()); // to parse req.body
@@ -84,9 +85,11 @@ app.use(
 );
 app.use(passport.authenticate("session"));
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
 /* Handling CORS Request errors */
 const corsOptions = {
-  origin: "http://localhost:3000", // Adjust this if you're using a different frontend URL
+  origin: FRONTEND_URL, // Adjust this if you're using a different frontend URL
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS", "PUT"], // Include PATCH method
   allowedHeaders: ["Content-Type", "Authorization"], // Allow necessary headers
   exposedHeaders: ["X-Total-Count"], // For pagination
@@ -119,7 +122,7 @@ passport.use(
       try {
         const user = await User.findOne({ email: email });
         // console.log("Data from LocalStrategy",email, password, user);
-        console.log("User", user);
+        // console.log("User", user);
         if (!user) {
           // console.log("Error", user);
           return done(null, false, { message: "invalid credentials" }); // for safety
@@ -141,7 +144,7 @@ passport.use(
           }
         );
       } catch (error) {
-        console.log("ERROR",error)
+        // console.log("ERROR",error)
         done(error);
       }
     }
@@ -186,6 +189,8 @@ passport.deserializeUser(function (user, cb) {
 });
 
 /* Payments */
+
+// mongodb://localhost:27017/
 
 // This is your test secret API key.
 const stripe = require("stripe")(process.env.STRIPE_SERVER_KEY);

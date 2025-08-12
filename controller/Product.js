@@ -20,18 +20,24 @@ exports.fetchProductsAPI = async (req,res) =>{
         condition = {deleted : {$ne : true}};
     }
 
+    console.log(req.query)
 
     let query = Product.find(condition)
 
     if(req.query.category) {
-        query = query.find({category : req.query.category})
+        let categoryArray = req.query.category.split("_")
+        // console.log("categoryArray",categoryArray)
+        query = query.find({category : [...categoryArray]})
     }
 
     if(req.query.brand) {
-        query = query.find({brand : req.query.brand})
+        let brandArray = req.query.brand.split("_")
+        console.log("Brand Array : ",brandArray)
+        query = query.find({brand : [...brandArray]})
     }
 
-    if(req.query._sort && req.query._order) {
+    // console.log(req.query._sort)
+    if(req.query._sort && req.query._order && !(req.query._sort == 'reset' && req.query._order == 'reset')) {
         query = query.sort({[req.query._sort]:req.query._order=='asc'? 1:-1})
     }
 
