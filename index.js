@@ -32,6 +32,7 @@ const opts = {};
 opts.jwtFromRequest = cookiExtractor;
 opts.secretOrKey = process.env.JWT_SECRET_KEY; // TODO: should not be in code;
 
+// console.log("JWT FROM REQUEST",opts.jwtFromRequest)
 
 
 // Webhook
@@ -116,18 +117,16 @@ passport.use(
       passwordField: "password",
     },
     async function (email, password, done) {
-      // console.log("LocalStrategy")
-      // console.log("email", email);
-      // console.log("password", password);
       try {
         const user = await User.findOne({ email: email });
-        // console.log("Data from LocalStrategy",email, password, user);
-        // console.log("User", user);
+        // If user not found ----
         if (!user) {
           // console.log("Error", user);
+          // done(error,authentication failed ? false : true, optional (message for failre))
           return done(null, false, { message: "invalid credentials" }); // for safety
         }
 
+        // If user found --- then,
         crypto.pbkdf2(
           password,
           user.salt,
@@ -135,16 +134,18 @@ passport.use(
           32,
           "sha256",
           async function (err, hashedPassword) {
+            // If password doesn't match -----
             if (!crypto.timingSafeEqual(user.password, hashedPassword)) {
               return done(null, false, { message: "invalid credentials" });
             }
+            // else -----
             const token = jwt.sign(sanitizeUser(user), process.env.JWT_SECRET_KEY);
+            // res.cookie("jwt",token,{httpOnly:true, sameSite: "lax", secure:false})
             // console.log("Sending success message", token);
             done(null, { id: user.id, role: user.role, token }); // this line calls serializer
           }
         );
       } catch (error) {
-        // console.log("ERROR",error)
         done(error);
       }
     }
@@ -174,8 +175,8 @@ passport.use(
 
 // this creates session variable req.user on being called
 passport.serializeUser(function (user, cb) {
-  // console.log("Serialize", user);
-  process.nextTick(function () {
+  // console.log("Serializer called with data ===> ", user);
+  process.nextTick(function () { // This nextTick will be executed RIGHT after all synchronous operations
     return cb(null, { id: user.id, role: user.role });
   });
 });

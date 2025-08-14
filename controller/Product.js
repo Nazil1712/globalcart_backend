@@ -20,7 +20,7 @@ exports.fetchProductsAPI = async (req,res) =>{
         condition = {deleted : {$ne : true}};
     }
 
-    console.log(req.query)
+    // console.log(req.query)
 
     let query = Product.find(condition)
 
@@ -32,7 +32,7 @@ exports.fetchProductsAPI = async (req,res) =>{
 
     if(req.query.brand) {
         let brandArray = req.query.brand.split("_")
-        console.log("Brand Array : ",brandArray)
+        // console.log("Brand Array : ",brandArray)
         query = query.find({brand : [...brandArray]})
     }
 

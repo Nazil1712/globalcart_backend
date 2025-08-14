@@ -43,6 +43,6 @@ exports.sendMail = async function (to, subject, text, html) {
     text: text,
   });
 
-  console.log("Email info", info);
+  // console.log("Email info", info);
   return info
 };

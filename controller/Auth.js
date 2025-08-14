@@ -43,22 +43,27 @@ exports.createUserAPI = async (req, res) => {
 };
 
 exports.loginUserAPI = async (req, res) => {
+
+  const user = req.user;
+
   res
-    .cookie("jwt", req.user.token, {
+    .cookie("jwt", user.token, {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
+      sameSite: "Lax"
     })
     .status(201)
-    .json(req.user);
+    .json({id: user.id, role:user.role});
 
   // console.log("Cookie has been set successfully");
 };
 
 exports.checkAuth = async (req, res) => {
+  // console.log(req.user, "user")
   if (req.user) {
     res.json(req.user);
   } else {
-    console.log("hey bro Error is here");
+    // console.log("hey bro Error is here");
     res.sendStatus(401);
   }
 };
@@ -76,13 +81,13 @@ exports.resetPasswordRequest = async (req, res) => {
     const subject = "Reset password for E-commerce";
     const html = `<p>Click <a href=${resetPageLink}>here</a> to reset your password</p>`;
 
-    console.log("FOr mail sending", req.body);
+    // console.log("FOr mail sending", req.body);
     if (email) {
       const response = await sendMail(req.body.email, subject, null, html);
-      console.log("REsponse", response);
+      // console.log("REsponse", response);
       res.send({status: "Success"})
     } else {
-      console.log("hey bro Error is here");
+      // console.log("hey bro Error is here");
       res.sendStatus(401);
     }
   }
@@ -117,10 +122,10 @@ exports.resetPassword = async (req, res) => {
     // console.log("FOr mail sending", req.body);
     if (email) {
       const response = await sendMail(req.body.email, subject, null, html);
-      console.log("REsponse", response);
+      // console.log("REsponse", response);
       res.send({status: "Success"})
     } else {
-      console.log("hey bro Error is here");
+      // console.log("hey bro Error is here");
       res.sendStatus(401);
     }
   }
