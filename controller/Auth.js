@@ -50,7 +50,8 @@ exports.loginUserAPI = async (req, res) => {
     .cookie("jwt", user.token, {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
-      sameSite: "Lax"
+      sameSite: "none",
+      secure: true
     })
     .status(201)
     .json({id: user.id, role:user.role});
