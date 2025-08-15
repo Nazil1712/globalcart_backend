@@ -82,11 +82,17 @@ app.use(
     secret: process.env.SESSION_SECRET_KEY,
     resave: false, // If false, don't save session if unmodified
     saveUninitialized: false, // If false, don't create session until something is stored
+    cookie:{
+      httpOnly: true,
+      secure: true,          // required for cross-site cookies in prod
+      sameSite: "none",      // required when frontend is on a different domain
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+    }
   })
 );
 app.use(passport.authenticate("session"));
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 /* Handling CORS Request errors */
 const corsOptions = {
