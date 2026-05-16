@@ -229,8 +229,6 @@ async function main() {
   console.log("Datbase connected");
 }
 
-const PORT = 8080;
-
 app.get("/", (req, res) => {
   res.json({ status: "success" });
 });

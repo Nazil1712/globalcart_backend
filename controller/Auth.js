@@ -14,7 +14,7 @@ exports.createUserAPI = async (req, res) => {
       310000,
       32,
       "sha256",
-      async function (err, hashedPassword) {
+      /* async function (err, hashedPassword) {
         const user = new User({ ...req.body, password: hashedPassword, salt });
         const doc = await user.save();
         const userIdR = sanitizeUser(doc);
@@ -28,14 +28,24 @@ exports.createUserAPI = async (req, res) => {
               .cookie("jwt", token, {
                 expires: new Date(Date.now() + 3600000),
                 httpOnly: true,
-                sameSite: "Strict",
+                sameSite: "none",
+                secure: true,
               })
               .status(201)
               .json(userIdR);
             // console.log("Token", token);
           }
         });
-      }
+      }, */
+      async function (err, hashedPassword) {
+        if (err) {
+          res.status(500).json(err);
+        }
+        const user = new User({ ...req.body, password: hashedPassword, salt });
+        const doc = await user.save();
+        const sanitizedUser = sanitizeUser(doc);
+        res.status(201).json(sanitizedUser);
+      },
     );
   } catch (error) {
     res.status(400).json(error);
@@ -43,7 +53,6 @@ exports.createUserAPI = async (req, res) => {
 };
 
 exports.loginUserAPI = async (req, res) => {
-
   const user = req.user;
 
   res
@@ -51,10 +60,10 @@ exports.loginUserAPI = async (req, res) => {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
       sameSite: "none",
-      secure: true
+      secure: true,
     })
     .status(201)
-    .json({id: user.id, role:user.role});
+    .json({ id: user.id, role: user.role });
 
   // console.log("Cookie has been set successfully");
 };
@@ -70,15 +79,16 @@ exports.checkAuth = async (req, res) => {
 };
 
 exports.resetPasswordRequest = async (req, res) => {
-  const email = req.body.email
-  const user = await User.findOne({ email:  email});
+  const email = req.body.email;
+  const user = await User.findOne({ email: email });
 
   if (user) {
     const token = crypto.randomBytes(40).toString("hex");
     user.resetPasswordToken = token;
-    await user.save()
+    await user.save();
 
-    const resetPageLink = `http://localhost:3000/reset-password?token=`+token+`&email=${email}`;
+    const resetPageLink =
+      `http://localhost:3000/reset-password?token=` + token + `&email=${email}`;
     const subject = "Reset password for E-commerce";
     const html = `<p>Click <a href=${resetPageLink}>here</a> to reset your password</p>`;
 
@@ -86,21 +96,22 @@ exports.resetPasswordRequest = async (req, res) => {
     if (email) {
       const response = await sendMail(req.body.email, subject, null, html);
       // console.log("REsponse", response);
-      res.send({status: "Success"})
+      res.send({ status: "Success" });
     } else {
       // console.log("hey bro Error is here");
       res.sendStatus(401);
     }
-  }
-  else{
-    res.sendStatus(401);
+  } else {
+    res.status(404).json({
+      message: "User not found!",
+    });
   }
 };
 
 exports.resetPassword = async (req, res) => {
-  const {email, password, token} = req.body
+  const { email, password, token } = req.body;
 
-  const user = await User.findOne({ email:  email, resetPasswordToken: token});
+  const user = await User.findOne({ email: email, resetPasswordToken: token });
 
   if (user) {
     const salt = crypto.randomBytes(16);
@@ -113,8 +124,8 @@ exports.resetPassword = async (req, res) => {
       async function (err, hashedPassword) {
         user.password = hashedPassword;
         user.salt = salt;
-        await user.save()
-      }
+        await user.save();
+      },
     );
 
     const subject = "Password successfully reset for E-commerce";
@@ -124,26 +135,24 @@ exports.resetPassword = async (req, res) => {
     if (email) {
       const response = await sendMail(req.body.email, subject, null, html);
       // console.log("REsponse", response);
-      res.send({status: "Success"})
+      res.send({ status: "Success" });
     } else {
       // console.log("hey bro Error is here");
       res.sendStatus(401);
     }
-  }
-  else{
+  } else {
     res.sendStatus(401);
   }
 };
 
-
-exports.logOut = async(req,res) =>{
+exports.logOut = async (req, res) => {
   res
     .cookie("jwt", null, {
       expires: new Date(Date.now()),
       httpOnly: true,
     })
     .status(200)
-    .json({status: "success"})
+    .json({ status: "success" });
 
   // console.log("SignOut controller called");
-}
+};

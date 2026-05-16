@@ -47,6 +47,9 @@ exports.fetchProductsAPI = async (req,res) =>{
     }catch(error) {
         res.status(400).json(error)
     }
+
+    // 10 * 1 => 0
+    // 10 * 2 => 10
     
 
     if(req.query._page && req.query._limit) {
