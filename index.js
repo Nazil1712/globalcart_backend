@@ -22,6 +22,7 @@ const userRouter = require("./routes/User");
 const authRouter = require("./routes/Auth");
 const cartRouter = require("./routes/Cart");
 const orderRouter = require("./routes/Order");
+const wishListRouter = require("./routes/WishList");
 const cors = require("cors");
 const { User } = require("./model/User");
 const { isAuth, sanitizeUser, cookiExtractor } = require("./services/common");
@@ -33,7 +34,6 @@ opts.jwtFromRequest = cookiExtractor;
 opts.secretOrKey = process.env.JWT_SECRET_KEY; // TODO: should not be in code;
 
 // console.log("JWT FROM REQUEST",opts.jwtFromRequest)
-
 
 // Webhook
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
@@ -63,12 +63,12 @@ app.post(
         break;
       // ... handle other event types
       default:
-        // console.log(`Unhandled event type ${event.type}`);
+      // console.log(`Unhandled event type ${event.type}`);
     }
 
     // Return a 200 response to acknowledge receipt of the event
     response.send();
-  }
+  },
 );
 
 // app.use(express.static(path.resolve(__dirname,'build')))
@@ -82,17 +82,17 @@ app.use(
     secret: process.env.SESSION_SECRET_KEY,
     resave: false, // If false, don't save session if unmodified
     saveUninitialized: false, // If false, don't create session until something is stored
-    cookie:{
+    cookie: {
       httpOnly: true,
-      secure: true,          // required for cross-site cookies in prod
-      sameSite: "none",      // required when frontend is on a different domain
+      secure: true, // required for cross-site cookies in prod
+      sameSite: "none", // required when frontend is on a different domain
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-    }
-  })
+    },
+  }),
 );
 app.use(passport.authenticate("session"));
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 /* Handling CORS Request errors */
 const corsOptions = {
@@ -113,6 +113,7 @@ app.use("/users", isAuth(), userRouter);
 app.use("/auth", authRouter);
 app.use("/cart", isAuth(), cartRouter);
 app.use("/order", isAuth(), orderRouter);
+app.use("/wishlist", isAuth(), wishListRouter);
 
 // LocalStrategy
 passport.use(
@@ -145,17 +146,20 @@ passport.use(
               return done(null, false, { message: "invalid credentials" });
             }
             // else -----
-            const token = jwt.sign(sanitizeUser(user), process.env.JWT_SECRET_KEY);
+            const token = jwt.sign(
+              sanitizeUser(user),
+              process.env.JWT_SECRET_KEY,
+            );
             // res.cookie("jwt",token,{httpOnly:true, sameSite: "lax", secure:false})
             // console.log("Sending success message", token);
             done(null, { id: user.id, role: user.role, token }); // this line calls serializer
-          }
+          },
         );
       } catch (error) {
         done(error);
       }
-    }
-  )
+    },
+  ),
 );
 
 // Jwt Strategy
@@ -176,13 +180,14 @@ passport.use(
     } catch (err) {
       return done(err, false);
     }
-  })
+  }),
 );
 
 // this creates session variable req.user on being called
 passport.serializeUser(function (user, cb) {
   // console.log("Serializer called with data ===> ", user);
-  process.nextTick(function () { // This nextTick will be executed RIGHT after all synchronous operations
+  process.nextTick(function () {
+    // This nextTick will be executed RIGHT after all synchronous operations
     return cb(null, { id: user.id, role: user.role });
   });
 });
