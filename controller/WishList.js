@@ -36,7 +36,7 @@ exports.addToWishlist = async (req, res) => {
 
 // Get Logged In User Wishlist
 exports.getWishlist = async (req, res) => {
-  console.log("Req", req);
+  // console.log("Req", req);
   try {
     const wishlist = await WishList.find({
       user: req.user.id,
